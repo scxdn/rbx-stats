@@ -1,0 +1,169 @@
+<head>
+    <script src="odometer.js"></script>
+    <link rel=stylesheet href="odometer.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous"> 
+</head>
+
+<style>
+    body {
+        background-color: rgb(15, 15, 15);
+    }
+    #titletext{
+        color: rgb(251, 255, 0);
+        font-family: Roboto;
+        font-size: 2em;
+        list-style: none;
+    }
+    #maincnt{
+        text-align: center;
+        margin-top: 20px;
+        background-color: black;
+        padding: 15px;
+    }
+    #maincount{
+        color: white;
+        font-family: Roboto;
+        font-weight: 700;
+        font-size: 10vw;
+        list-style: none;
+    }
+    #playercount,#favourites,#likescount,#dislikescount{
+        color: white;
+        font-family: Roboto;
+        font-weight: 700;
+        font-size: 4vw;
+        list-style: none;
+    }
+    #typetext{
+        color: lightgray;
+        font-family: roboto;
+        font-size: 1em;
+        list-style: none;
+    }
+    #thmb{
+        width: 500;
+        height: 281;
+    }
+
+    .parent {
+        display: grid;
+        grid-template-rows: repeat(5, 1fr);
+        grid-column-gap: 10px;
+        grid-row-gap: 0px;
+        text-align: center;
+        padding: 10px;
+    }
+
+.div1 { grid-area: 1 / 1 / 2 / 2; }
+.div2 { grid-area: 1 / 2 / 2 / 3; }
+.div3 { grid-area: 1 / 3 / 2 / 4; }
+.div4 { grid-area: 1 / 4 / 2 / 5; }
+
+.div1,.div2,.div3,.div4{
+    background-color: rgb(35, 0, 17);
+}
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #ffffff transparent;
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #ffffff;
+    border-radius: 0px;
+    border: 3px solid #ffffff;
+  }
+</style>
+
+
+<div id="maincnt">
+    <img id="thmb" src="https://via.placeholder.com/768x432">
+    <li id="titletext">game title [updates!]</li>
+    <li class="odometer" id="maincount">4583986413</li>
+    <li id="typetext">place visits</li>
+</div>
+<div class="parent">
+    <div class="div1">
+        <li class="odometer" id="playercount">100000</li>
+        <li id="typetext">playing</li>
+    </div>
+    <div class="div2">
+        <li class="odometer" id="favourites">10000000</li>
+        <li id="typetext">favourites</li>
+    </div>
+    <div class="div3">
+        <li class="odometer" id="likescount">1000000</li>
+        <li id="typetext">likes</li>
+    </div>
+    <div class="div4">
+        <li class="odometer" id="dislikescount">10000</li>
+        <li id="typetext">dislikes</li>
+    </div>
+    </div>
+
+
+<script>
+    let visitsc = 0;
+    let creatorid = 0;
+    let likesc = 0;
+    let dislikesc = 0;
+    let players = 0;
+    let favouritesc = 0;
+    let titlet = '';
+    let imglink = '';
+    let universeids = 0;
+    let searched = window.location.href.split('?')[1] || '8737602449';
+
+    function getUniverse() {
+        fetch('http://localhost:90/uid/'+searched+'').then(res => res.json()).then(data => {
+            universeids = data.universe
+        });
+    }
+
+    function dostuff() {
+        fetch('http://localhost:90/games/'+universeids+'').then(res => res.json()).then(data => {
+            visitsc = data.visits;
+            likesc = data.likes;
+            dislikesc = data.dislikes;
+            titlet = data.title;
+            favouritesc = data.favourites;
+            fetch('https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds='+universeids+'&countPerUniverse=1&defaults=true&size=768x432&format=Png&isCircular=false').then(res => res.json()).then(datah => {
+               imglink = datah.data[0].thumbnails[0].imageUrl
+            });
+            players = data.playing;
+            creatorid = data.creatoruser;
+            maincount.innerHTML = visitsc;
+            likescount.innerHTML = likesc;
+            dislikescount.innerHTML = dislikesc;
+            playercount.innerHTML = players;
+            favourites.innerHTML = favouritesc;
+            titletext.innerHTML = titlet;
+            thmb.src = imglink;
+        });
+    
+    }
+
+    setTimeout(() => {
+        getUniverse();
+    }, 200);
+    setTimeout(() => {
+        dostuff();
+    }, 500);
+
+    setInterval(dostuff,2000);
+</script>
