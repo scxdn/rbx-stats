@@ -57,6 +57,7 @@
         grid-row-gap: 0px;
         text-align: center;
         padding: 10px;
+        height: 10vh;
     }
 
 .div1 { grid-area: 1 / 1 / 2 / 2; }
@@ -88,8 +89,26 @@
     border-radius: 0px;
     border: 3px solid #ffffff;
   }
+  #ver{
+    color: gray;
+    font-family: Roboto;
+    display: inline;
+  }
+  #reqc{
+    color: gray;
+    font-family: Roboto;
+    font-weight: 700;
+    display: inline;
+    font-size: 20px;
+  }
+  #tut{
+    color: lime;
+    font-family: Roboto;
+    text-align: center;
+  }
 </style>
-
+<p id="ver">rbx stats alpha 1.0 (3 December 2022) | total server requests:</p>
+<p class="odometer" id="reqc">1000</p>
 
 <div id="maincnt">
     <img id="thmb" src="https://via.placeholder.com/768x432">
@@ -115,10 +134,13 @@
         <li id="typetext">dislikes</li>
     </div>
     </div>
-
+    <p id="tut">TUTORIAL: in this website's URL, add ?ID [replace "ID" with the place id of the game you want to track.] (example: ?8737602449) ||
+        place id's are found in the game url between /games/ and /(title). example: https://www.roblox.com/games/176053469/New-User-Machine
+    </p>
 
 <script>
     let visitsc = 0;
+    let requests = 0;
     let creatorid = 0;
     let likesc = 0;
     let dislikesc = 0;
@@ -130,23 +152,22 @@
     let searched = window.location.href.split('?')[1] || '8737602449';
 
     function getUniverse() {
-        fetch('http://localhost:90/uid/'+searched+'').then(res => res.json()).then(data => {
+        fetch('https://roblox-statistics.ndx4256.repl.co/uid/'+searched+'').then(res => res.json()).then(data => {
             universeids = data.universe
         });
     }
 
     function dostuff() {
-        fetch('http://localhost:90/games/'+universeids+'').then(res => res.json()).then(data => {
+        fetch('https://roblox-statistics.ndx4256.repl.co/games/'+universeids+'').then(res => res.json()).then(data => {
             visitsc = data.visits;
             likesc = data.likes;
             dislikesc = data.dislikes;
             titlet = data.title;
             favouritesc = data.favourites;
-            fetch('https://thumbnails.roblox.com/v1/games/multiget/thumbnails?universeIds='+universeids+'&countPerUniverse=1&defaults=true&size=768x432&format=Png&isCircular=false').then(res => res.json()).then(datah => {
-               imglink = datah.data[0].thumbnails[0].imageUrl
-            });
             players = data.playing;
             creatorid = data.creatoruser;
+            imglink = data.thumbnail;
+            requests = data.apirequests;
             maincount.innerHTML = visitsc;
             likescount.innerHTML = likesc;
             dislikescount.innerHTML = dislikesc;
@@ -154,6 +175,7 @@
             favourites.innerHTML = favouritesc;
             titletext.innerHTML = titlet;
             thmb.src = imglink;
+            reqc.innerHTML = requests;
         });
     
     }
